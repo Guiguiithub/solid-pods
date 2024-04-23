@@ -71,6 +71,29 @@ async function getMyPods() {
 
     // Update the page with the retrieved values.
 
+    for (const podUrl of mypods){
+        const readingListUrl = `${podUrl}getting-started/readingList/myList`;
+        try {
+            const readingList = await getSolidDataset(readingListUrl, { fetch: fetch });
+            const items = getThingAll(readingList);
+            console.log(items)
+
+            let listcontent = `<h4>Reading List from ${podUrl}</h4>`;
+            for (let i = 0; i < items.length; i++) {
+                const item = getStringNoLocale(items[i], SCHEMA_INRUPT.name);
+                if (item !== null) {
+                    listcontent += `<p>${item}</p>`;
+                }
+            }
+
+            // Append content to displayAll div
+            document.getElementById("displayAll").innerHTML += listcontent;
+
+        } catch (error) {
+            console.error(`Error fetching reading list from ${podUrl}:`, error);
+        }
+    }
+
     mypods.forEach((mypod) => {
         let podOption = document.createElement("option");
         podOption.textContent = mypod;
