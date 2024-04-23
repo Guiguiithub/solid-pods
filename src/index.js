@@ -23,23 +23,16 @@ import {
 
 import { SCHEMA_INRUPT, RDF, AS } from "@inrupt/vocab-common-rdf";
 
-const selectorIdP = document.querySelector("#select-idp");
-const selectorPod = document.querySelector("#select-pod");
 const buttonLogin = document.querySelector("#btnLogin");
-const buttonRead = document.querySelector("#btnRead");
-const buttonCreate = document.querySelector("#btnCreate");
 const labelCreateStatus = document.querySelector("#labelCreateStatus");
-
-buttonRead.setAttribute("disabled", "disabled");
-buttonLogin.setAttribute("disabled", "disabled");
-buttonCreate.setAttribute("disabled", "disabled");
+let webId ;
+let myPod ;
 
 // 1a. Start Login Process. Call login() function.
 function loginToSelectedIdP() {
-    const SELECTED_IDP = document.getElementById("select-idp").value;
 
     return login({
-        oidcIssuer: SELECTED_IDP,
+        oidcIssuer: "https://solidcommunity.net/",
         redirectUrl: new URL("/", window.location.href).toString(),
         clientName: "Getting started app"
     });
@@ -53,10 +46,9 @@ async function handleRedirectAfterLogin() {
     const session = getDefaultSession();
     if (session.info.isLoggedIn) {
         // Update the page with the status.
-        document.getElementById("myWebID").value = session.info.webId;
+        webId = session.info.webId;
 
-        // Enable Read button to read Pod URL
-        buttonRead.removeAttribute("disabled");
+        getMyPods();
     }
 }
 
@@ -66,28 +58,32 @@ handleRedirectAfterLogin();
 
 // 2. Get Pod(s) associated with the WebID
 async function getMyPods() {
-    const webID = document.getElementById("myWebID").value;
-    const mypods = await getPodUrlAll(webID, { fetch: fetch });
+    const mypods = await getPodUrlAll(webId, { fetch: fetch });
 
     // Update the page with the retrieved values.
 
     for (const podUrl of mypods){
-        const readingListUrl = `${podUrl}getting-started/readingList/myList`;
+        const readingLikeListUrl = `${podUrl}VideoGames/Like/myList`;
+        const readingDislikeListUrl = `${podUrl}VideoGames/Dislike/myList`;
         try {
-            const readingList = await getSolidDataset(readingListUrl, { fetch: fetch });
-            const items = getThingAll(readingList);
-            console.log(items)
+            const readingLikeList = await getSolidDataset(readingLikeListUrl, { fetch: fetch });
+            const readingDislikeList = await getSolidDataset(readingDislikeListUrl, { fetch: fetch });
+            const itemsLike = getThingAll(readingLikeList);
+            const itemsDislike = getThingAll(readingDislikeList);
 
             let listcontent = `<h4>Reading List from ${podUrl}</h4>`;
-            for (let i = 0; i < items.length; i++) {
-                const item = getStringNoLocale(items[i], SCHEMA_INRUPT.name);
+            for (let i = 0; i < itemsLike.length; i++) {
+                const item = getStringNoLocale(itemsLike[i], SCHEMA_INRUPT.name);
                 if (item !== null) {
-                    listcontent += `<p>${item}</p>`;
+                    listcontent += `<p>${itemsLike[i].predicates['http://schema.org/name'].literals['http://www.w3.org/2001/XMLSchema#string'][0]}</p>`;
                 }
             }
-
-            // Append content to displayAll div
-            document.getElementById("displayAll").innerHTML += listcontent;
+            for (let i = 0; i < itemsDislike.length; i++) {
+                const item = getStringNoLocale(itemsDislike[i], SCHEMA_INRUPT.name);
+                if (item !== null) {
+                    listcontent += `<p>${itemsDislike[i].predicates['http://schema.org/name'].literals['http://www.w3.org/2001/XMLSchema#string'][0]}</p>`;
+                }
+            }
 
         } catch (error) {
             console.error(`Error fetching reading list from ${podUrl}:`, error);
@@ -98,19 +94,19 @@ async function getMyPods() {
         let podOption = document.createElement("option");
         podOption.textContent = mypod;
         podOption.value = mypod;
-        selectorPod.appendChild(podOption);
+        myPod = podOption.value;
     });
 }
 
 // 3. Create the Reading List
 async function createList() {
     labelCreateStatus.textContent = "";
-    const SELECTED_POD = document.getElementById("select-pod").value;
 
     // For simplicity and brevity, this tutorial hardcodes the  SolidDataset URL.
     // In practice, you should add in your profile a link to this resource
     // such that applications can follow to find your list.
-    const readingListUrl = `${SELECTED_POD}getting-started/readingList/myList`;
+    const readingLikeListUrl = `${myPod}VideoGames/Like/myList`;
+    const readingDislikeListUrl = `${myPod}VideoGames/Dislike/myList`;
 
     let titles = document.getElementById("titles").value.split("\n");
 
@@ -119,9 +115,8 @@ async function createList() {
 
     try {
         // Attempt to retrieve the reading list in case it already exists.
-        myReadingList = await getSolidDataset(readingListUrl, { fetch: fetch });
+        myReadingList = await getSolidDataset(readingDislikeListUrl, { fetch: fetch });
         // Clear the list to override the whole list
-        console.log(myReadingList)
         /*
         let items = getThingAll(myReadingList);
         items.forEach((item) => {
@@ -137,7 +132,7 @@ async function createList() {
     }
 
     // Add titles to the Dataset
-    let i = 0;
+    let i = readingDislikeListUrl.length;
     titles.forEach((title) => {
         if (title.trim() !== "") {
             let item = createThing({ name: "title" + i });
@@ -151,7 +146,7 @@ async function createList() {
     try {
         // Save the SolidDataset
         let savedReadingList = await saveSolidDatasetAt(
-            readingListUrl,
+            readingDislikeListUrl,
             myReadingList,
             { fetch: fetch }
         );
@@ -159,7 +154,7 @@ async function createList() {
         labelCreateStatus.textContent = "Saved";
 
         // Refetch the Reading List
-        savedReadingList = await getSolidDataset(readingListUrl, { fetch: fetch });
+        savedReadingList = await getSolidDataset(readingDislikeListUrl, { fetch: fetch });
 
         let items = getThingAll(savedReadingList);
 
@@ -182,29 +177,3 @@ async function createList() {
 buttonLogin.onclick = function () {
     loginToSelectedIdP();
 };
-
-buttonRead.onclick = function () {
-    getMyPods();
-};
-
-buttonCreate.onclick = function () {
-    createList();
-};
-
-selectorIdP.addEventListener("change", idpSelectionHandler);
-function idpSelectionHandler() {
-    if (selectorIdP.value === "") {
-        buttonLogin.setAttribute("disabled", "disabled");
-    } else {
-        buttonLogin.removeAttribute("disabled");
-    }
-}
-
-selectorPod.addEventListener("change", podSelectionHandler);
-function podSelectionHandler() {
-    if (selectorPod.value === "") {
-        buttonCreate.setAttribute("disabled", "disabled");
-    } else {
-        buttonCreate.removeAttribute("disabled");
-    }
-}
