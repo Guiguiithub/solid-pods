@@ -46,11 +46,13 @@ It is a solution for the future that, if adopted, would induce a paradigm shift 
 ```npm install @inrupt/solid-client @inrupt/solid-client-authn-browser @inrupt/vocab-common-rdf @inrupt/vocab-solid```
 4. Install the Webpack dependency (npm-leveraging framework)
 ```npm install webpack webpack-cli webpack-dev-server css-loader style-loader --save-dev```
-5. Install the needed packages for Python via the [requirements.txt](requirements.txt)
+5. Build the npm project
+```npm run build```
+6. Install the needed packages for Python via the [requirements.txt](requirements.txt)
 ```pip install -r requirements.txt```
-6. Install the Qdrant docker (via the command prompt for example)
+7. Install the Qdrant docker (via the command prompt for example)
 ```docker pull qdrant/qdrant```
-7. Run the docker
+8. Run the docker
 ```docker run -p 6333:6333 qdrant/qdrant```
 
 ### Preparation and Upload of the Dataset/Collection (pulled from the last project)
@@ -66,7 +68,7 @@ Once the code is finally done, we can check if our database exist on the [Qdrant
 ### Starting the solution
 1. Make sure the Docker is still running. If it's not, run
 ```docker run -p 6333:6333 qdrant/qdrant```
-2. Run [service.py](Code/service.py) and let it run behind
+2. Run [service.py](dist/Code/service.py) and let it run behind
 3. Start the npm project
 ```npm run start```
 4. You can now access the [application](http://localhost:8080/)
