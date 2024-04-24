@@ -5,7 +5,7 @@ by Henriques Amaral Guilherme Filipe, Schneider Bastien, Salamin Alexandre
 ## Description of the project
 This project focuses on exploring the concept of solid PODs through a simple concrete example. In this project, we are leveraging [Solid Community](https://solidcommunity.net/), a solution made for the creation of simple applications and allowing for a more efficient PODs implementation.
 
-For this example, we are developing on and expending our [first project](https://gitlab.com/Hypnot/vector-database) which was a video games platform that allowed the user to select the games they like and the ones they dislike to generate, based on that, pertinent recommendations on the home page. That project was leveraging a vector database to manage the recommendations. Here, the idea is to add a login option on this solution and keep the likes/dislikes in memory using solid PODs (through [Solid Community](https://solidcommunity.net/)).
+For this example, we are developing on and expending our [first project](https://gitlab.com/Hypnot/vector-database) which was a video games platform that allowed the user to select the games they like and the ones they dislike to generate, based on that, pertinent recommendations on the home page. That project was leveraging a [vector database](documents/vector.md) to manage the recommendations. Here, the idea is to add a login option on this solution and keep the likes/dislikes in memory using solid PODs (through [Solid Community](https://solidcommunity.net/)).
 
 We will mainly focus on the explanation of the concept of solid PODs and their potential use.
 
@@ -46,12 +46,12 @@ It is a solution for the future that, if adopted, would induce a paradigm shift 
 ### Preparation and uploading of the dataset/collection (pulled from the last project)
 You can create your own dataset manually by following this [guide](https://qdrant.tech/documentation/quick-start/#create-a-collection), but for our project we decided to find a dataset online already made, for exemple, in [kaggle](https://www.kaggle.com/datasets)
 
-The dataset we chose is the [steam dataset](https://www.kaggle.com/datasets/deepann/80000-steam-games-dataset?resource=download) and it gives us a .csv and a .json. We extract the .json and put it in ``Data/RawData`` then we run the code [datasetPreparation.py](Code/datasetPreparation.py) (Make sure to do the necessary path correction).
+The dataset we chose is the [steam dataset](https://www.kaggle.com/datasets/deepann/80000-steam-games-dataset?resource=download) and it gives us a .csv and a .json. We extract the .json and put it in ``Data/RawData`` then we run the code [datasetPreparation.py](dist/Code/datasetPreparation.py) (Make sure to do the necessary path correction).
 
-Next, we need to upload the dataset in the vector database and, to do that, we run the code [uploadToDb.py](Code/uploadToDb.py).
+Next, we need to upload the dataset in the vector database and, to do that, we run the code [uploadToDb.py](dist/Code/uploadToDb.py).
 
 Once the code is finally done, we can check if our database exist on the [Qdrant UI](http://localhost:6333/dashboard#/collections) and, as we can see, our dataset is complete.
-![result01](Documents/Images/result01.png) ![result02](Documents/Images/result02.png)
+![result01](documents/Images/result01.png) ![result02](documents/Images/result02.png)
 
 ### Starting the solution
 1. Make sure the Docker is still running. If it's not, run
@@ -69,12 +69,12 @@ Only once logged-in, will you be able to navigate the video games dataset:
 
 On the homepage, you can search a game title, like the game, dislike it, access to the Recommendation page and the Basket page.
 
-When you like or dislike a game, it will enter to the Basket page and when you access the Recommendation page, it will show you games based on the liked games, the disliked games and the games that are close to the disliked games will be filthered from the recommendation page. ![result04](Documents/Images/result04.png)
+When you like or dislike a game, it will enter to the Basket page and when you access the Recommendation page, it will show you games based on the liked games, the disliked games and the games that are close to the disliked games will be filthered from the recommendation page. ![result04](documents/Images/result04.png)
 You can like/dislike a game from the recommendation page and it will added to the Basket page then remove from the recommendation page.
 
-You can access to your liked/disliked games in the Basket page. You can remove them if necessary. ![result05](Documents/Images/result05.png)
+You can access to your liked/disliked games in the Basket page. You can remove them if necessary. ![result05](documents/Images/result05.png)
 
-If we go back to the Home page and try to search a game, for exemple, Grand Theft Auto, we have this results : ![result06](Documents/Images/result06.png)
+If we go back to the Home page and try to search a game, for exemple, Grand Theft Auto, we have this results : ![result06](documents/Images/result06.png)
 
 As we can see, our research get the closest game base on the vector and the search.
 
