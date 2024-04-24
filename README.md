@@ -7,7 +7,7 @@ by Henriques Amaral Guilherme Filipe, Schneider Bastien and Salamin Alexandre
 * [Requirements](#requirement)
 * [Setup](#setup)
   * [Installing Everything](#installing-everything)
-  * [Preparation and Upload of the Dataset/Collection (pulled from the last project)](#preparation-and-uploading-of-the-datasetcollection-pulled-from-the-last-project)
+  * [Preparation and Upload of the Dataset/Collection (pulled from the last project)](#preparation-and-upload-of-the-datasetcollection-pulled-from-the-last-project)
   * [Starting the Solution](#starting-the-solution)
 * [The Web Application](#the-web-application)
 * [Error Handling](#error-handling)
