@@ -2,8 +2,9 @@
 import {
     login,
     handleIncomingRedirect,
+    events,
     getDefaultSession,
-    fetch
+    fetch, EVENTS
 } from "@inrupt/solid-client-authn-browser";
 
 // Import from "@inrupt/solid-client"
@@ -18,7 +19,7 @@ import {
     getStringNoLocale,
     removeThing,
     saveSolidDatasetAt,
-    setThing
+    setThing, getUrl
 } from "@inrupt/solid-client";
 
 import { SCHEMA_INRUPT, RDF, AS } from "@inrupt/vocab-common-rdf";
@@ -27,35 +28,71 @@ const buttonLogin = document.querySelector("#btnLogin");
 const labelCreateStatus = document.querySelector("#labelCreateStatus");
 let webId ;
 let myPod ;
+let username ;
+let urlName;
 
+function getPage(){
+    let allPath = window.location.href.toString();
+    if(allPath.includes("recommendation")){
+        urlName = "/recommendation"
+    } else {
+        urlName = "/"
+    }
+}
 // 1a. Start Login Process. Call login() function.
 function loginToSelectedIdP() {
-
+    getPage();
     return login({
         oidcIssuer: "https://solidcommunity.net/",
-        redirectUrl: new URL("/", window.location.href).toString(),
+        redirectUrl: new URL(urlName, window.location.href).toString(),
         clientName: "Getting started app"
     });
 }
 
+async function isConnected() {
+    let session = getDefaultSession();
+    if (session.info.isLoggedIn) {
+        webId = session.info.webId;
+        await getUsername();
+        document.getElementById('btnLogin').style.display = 'none';
+        document.getElementById('userWebId').style.display = 'inline';
+        document.getElementById('userWebId').innerText = username;
+
+        localStorage.setItem('solid-auth-client', JSON.stringify(session))
+        getMyPods();
+    }
+}
 // 1b. Login Redirect. Call handleIncomingRedirect() function.
 // When redirected after login, finish the process by retrieving session information.
 async function handleRedirectAfterLogin() {
-    await handleIncomingRedirect(); // no-op if not part of login redirect
+    let session = await getDefaultSession();
+    session.events.on(EVENTS.SESSION_RESTORED, (url)=> {
+        urlName = url;
+        console.log(urlName)
+    })
+    await handleIncomingRedirect({restorePreviousSession : true}); // no-op if not part of login redirect
 
-    const session = getDefaultSession();
-    if (session.info.isLoggedIn) {
-        // Update the page with the status.
-        webId = session.info.webId;
-
-        getMyPods();
-    }
+    await isConnected();
 }
 
 // The example has the login redirect back to the root page.
 // The page calls this method, which, in turn, calls handleIncomingRedirect.
 handleRedirectAfterLogin();
 
+async function getUsername(){
+    const myPods = await getPodUrlAll(webId, {fetch: fetch});
+    for (const podUrl of myPods){
+        const readingUsername = `${podUrl}profile/card` ;
+        try {
+            const readingUsernameList = await getSolidDataset(readingUsername, {fetch: fetch});
+            const items = getThingAll(readingUsernameList);
+            username = items[1].predicates["http://xmlns.com/foaf/0.1/name"].literals['http://www.w3.org/2001/XMLSchema#string'][0]
+
+        } catch (error) {
+            console.error(`Error fetching reading list from ${podUrl}:`, error);
+        }
+    }
+}
 // 2. Get Pod(s) associated with the WebID
 async function getMyPods() {
     const mypods = await getPodUrlAll(webId, { fetch: fetch });

@@ -1,10 +1,15 @@
 const path = require("path");
 module.exports = {
     mode: "development",
-    entry: "./src/index.js",
+    entry: {
+        index: "./src/index.js",
+        recommendation: "./src/recommendation.js",
+        basket: "./src/basket.js",
+        data: "./src/getData.js"
+    },
     output: {
         path: path.resolve(__dirname, "dist"),
-        filename: "index.js",
+        filename: "[name].js",
     },
     module: {
         rules: [
