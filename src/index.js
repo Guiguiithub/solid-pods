@@ -68,11 +68,16 @@ async function handleRedirectAfterLogin() {
     let session = await getDefaultSession();
     session.events.on(EVENTS.SESSION_RESTORED, (url)=> {
         urlName = url;
+        login({
+        oidcIssuer: "https://solidcommunity.net/",
+        redirectUrl: new URL(urlName, window.location.href).toString(),
+        clientName: "Getting started app"})
         console.log(urlName)
     })
-    await handleIncomingRedirect({restorePreviousSession : true}); // no-op if not part of login redirect
 
+    await session.handleIncomingRedirect({ restorePreviousSession : true }); // no-op if not part of login redirect
     await isConnected();
+
 }
 
 // The example has the login redirect back to the root page.
