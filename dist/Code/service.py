@@ -10,11 +10,7 @@ app = FastAPI()
 neural_searcher = NeuralSearcher(collection_name="steamVideoGames")
 
 # allow access
-origins = [
-    "http://localhost:63342",
-    "https://localhost:63342",
-    "http://127.0.0.1:63342",
-    "https://127.0.0.1:63342",
+origins = ["*"
 ]
 
 # Add CORS middleware
