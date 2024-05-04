@@ -10,7 +10,6 @@ by Henriques Amaral Guilherme Filipe, Schneider Bastien and Salamin Alexandre
   * [Preparation and Upload of the Dataset/Collection (pulled from the last project)](#preparation-and-upload-of-the-datasetcollection-pulled-from-the-last-project)
   * [Starting the Solution](#starting-the-solution)
 * [The Web Application](#the-web-application)
-* [Error Handling](#error-handling)
 
 ## Description of the Project
 This project focuses on exploring the concept of solid PODs through a simple concrete example. In this project, we are 
