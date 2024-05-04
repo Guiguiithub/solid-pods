@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Response
 from fastapi.middleware.cors import CORSMiddleware
 import json
 
@@ -9,16 +9,12 @@ app = FastAPI()
 # Create a neural searcher instance
 neural_searcher = NeuralSearcher(collection_name="steamVideoGames")
 
-# allow access
-origins = ["*"
-]
-
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["Content-Type"],
 )
 
@@ -35,6 +31,13 @@ def all_startup():
         return {"result": data}
     except Exception as e:
         return {"error": str(e)}
+
+@app.options("/api/getall")
+def options_getall(response: Response):
+    response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["Access-Control-Allow-Methods"] = "GET, OPTIONS"
+    response.headers["Access-Control-Allow-Headers"] = "Content-Type"
+    return response
 
 @app.post("/api/recommend")
 def recommend(request: dict):
@@ -58,6 +61,16 @@ def search_id(request: dict):
         liked_ids = json.loads(rawLike)
         print(liked_ids)
         data = neural_searcher.search_id(liked_ids)
+        return {"result": data}
+    except Exception as e:
+        return {"error": e}
+
+@app.post("/api/look")
+def look_id(request: str):
+    try:
+        print(request)
+        data = neural_searcher.look_id(request)
+        print(data)
         return {"result": data}
     except Exception as e:
         return {"error": e}

@@ -71,3 +71,19 @@ class NeuralSearcher:
         )
 
         return get_results(hits[0], False)
+
+    def look_id(self, text: str) -> List[dict]:
+        print("here")
+        hits = self.qdrant_client.scroll(
+            collection_name=self.collection_name,
+            scroll_filter=models.Filter(
+                must=[
+                    models.HasIdCondition(has_id=[text]),
+                ]
+            )
+        )
+        print(hits)
+        if hits:
+            return get_results(hits[0], False)
+        else:
+            return []
